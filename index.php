@@ -19,10 +19,10 @@ include __DIR__ . '/includes/head.php';
 include __DIR__ . '/includes/header.php';
 ?>
 
-<main class="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
+<main class="mx-auto w-full max-w-7xl flex-1 px-4 pb-8 pt-10 xl:max-w-none xl:px-[8.8vw] xl:pt-[4.75vw]">
     <div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
         <span class="hidden w-56 sm:block"></span>
-        <h1 class="text-2xl font-extrabold tracking-wide">CHARACTERS</h1>
+        <h1 class="text-[length:clamp(26px,1.878vw,48px)] font-bold leading-none">CHARACTERS</h1>
 
         <div class="flex w-56 items-center gap-3">
             <label for="q" class="sr-only">Buscar personaje</label>
@@ -37,24 +37,24 @@ include __DIR__ . '/includes/header.php';
         </div>
     </div>
 
-    <h2 class="mt-6 text-lg font-extrabold">UMAMUSUME</h2>
+    <h2 class="mt-6 text-[length:clamp(22px,1.565vw,40px)] font-bold leading-none xl:mt-[1.88vw]">UMAMUSUME</h2>
 
-    <ul class="mt-4 grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+    <ul class="mt-4 grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-5 xl:mt-[2.09vw] xl:grid-cols-[repeat(5,9.8vw)] xl:gap-x-[8.8vw] xl:gap-y-[2.14vw]">
         <?php foreach ($characters as $c):
             $img = 'assets/img/characters/' . $c['slug'] . '.png'; ?>
             <li>
-                <a href="#" class="mx-auto block w-full max-w-[160px]">
+                <a href="#" class="mx-auto block w-full max-w-[160px] xl:mx-0 xl:max-w-none">
                     <div class="aspect-[3/4] overflow-hidden border border-black bg-white">
                         <?php if (asset_exists($img)): ?>
                             <img src="<?= $img ?>" alt="<?= $c['name'] ?>" loading="lazy" class="h-full w-full object-cover object-top">
                         <?php else: ?>
-                            <div class="flex h-full w-full items-center justify-center bg-gradient-to-b from-pink-100 to-purple-200 text-5xl font-extrabold text-brand-pink"
+                            <div class="flex h-full w-full items-center justify-center bg-gradient-to-b from-pink-100 to-purple-200 text-5xl font-bold text-brand-pink"
                                  role="img" aria-label="<?= $c['name'] ?>"><?= mb_substr($c['name'], 0, 1) ?></div>
                         <?php endif; ?>
                     </div>
-                    <div class="border border-t-0 border-black bg-brand-pink px-1 py-1 text-center text-white">
-                        <p class="truncate text-xs font-extrabold"><?= $c['name'] ?></p>
-                        <p class="truncate text-[10px] font-bold">VA: <?= $c['va'] ?></p>
+                    <div class="border border-t-0 border-black bg-brand-pink px-1 py-1 text-center text-white xl:py-[0.15vw]">
+                        <p class="truncate text-[length:clamp(11px,0.835vw,18px)] font-bold leading-tight"><?= $c['name'] ?></p>
+                        <p class="truncate text-[length:clamp(10px,0.73vw,16px)] font-bold leading-tight">VA: <?= $c['va'] ?></p>
                     </div>
                 </a>
             </li>

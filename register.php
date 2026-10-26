@@ -11,7 +11,7 @@ $inputClass = 'w-full rounded-full border border-black bg-white px-5 py-2.5 text
     <section class="flex flex-col items-center px-8 py-10">
         <a href="index.php" aria-label="Inicio"><?php $logoClass = 'h-20'; include __DIR__ . '/includes/logo.php'; ?></a>
 
-        <h1 class="mt-10 text-xl font-extrabold">Welcome new trainer!</h1>
+        <h1 class="mt-10 text-xl font-bold">Welcome new trainer!</h1>
 
         <!-- Solo maqueta: el botón lleva al Home, no valida nada -->
         <form action="index.php" class="mt-6 w-full max-w-[250px] space-y-4">
