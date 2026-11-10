@@ -1,5 +1,17 @@
 <?php
-require __DIR__ . '/includes/helpers.php';
+/**
+ * Autor: Raul Rubio - Pt04
+ * register.php
+ * Formulario de registro (la lógica está en controlador/auth.php).
+ * Si hay errores se conservan usuario y email; las contraseñas nunca se devuelven al navegador.
+ */
+require __DIR__ . '/includes/bootstrap.php';
+require __DIR__ . '/controlador/auth.php';
+
+exigirAnonimo();
+$estado  = procesarRegistro();
+$errores = $estado['errores'];
+$datos   = $estado['datos'];
 
 $title = 'Register · Umamusume: Pretty Derby';
 include __DIR__ . '/includes/head.php';
@@ -13,23 +25,37 @@ $inputClass = 'w-full rounded-full border border-black bg-white px-5 py-2.5 text
 
         <h1 class="mt-10 text-xl font-bold">Welcome new trainer!</h1>
 
-        <!-- Solo maqueta: el botón lleva al Home, no valida nada -->
-        <form action="index.php" class="mt-6 w-full max-w-[250px] space-y-4">
+        <form action="register.php" method="post" class="mt-6 w-full max-w-[250px] space-y-4" novalidate>
+            <?= campoCsrf() ?>
+
+            <?php if (!empty($errores['general'])): ?>
+                <p class="rounded-2xl border border-red-600 bg-red-100 px-4 py-2 text-xs font-bold text-red-800" role="alert"><?= e($errores['general']) ?></p>
+            <?php endif; ?>
+
             <div>
                 <label for="username" class="sr-only">Usuario</label>
-                <input id="username" type="text" placeholder="Username" class="<?= $inputClass ?>">
+                <input id="username" name="username" type="text" placeholder="Username" maxlength="30"
+                       value="<?= e($datos['username']) ?>" autocomplete="username" class="<?= $inputClass ?>">
+                <?= errorCampo($errores, 'username') ?>
             </div>
             <div>
                 <label for="email" class="sr-only">Email</label>
-                <input id="email" type="email" placeholder="Email" class="<?= $inputClass ?>">
+                <input id="email" name="email" type="email" placeholder="Email" maxlength="100"
+                       value="<?= e($datos['email']) ?>" autocomplete="email" class="<?= $inputClass ?>">
+                <?= errorCampo($errores, 'email') ?>
             </div>
             <div>
                 <label for="password" class="sr-only">Contraseña</label>
-                <input id="password" type="password" placeholder="Password" class="<?= $inputClass ?>">
+                <input id="password" name="password" type="password" placeholder="Password"
+                       autocomplete="new-password" class="<?= $inputClass ?>">
+                <p class="mt-1 px-3 text-[11px] text-gray-600">Mín. 8 caracteres, con mayúscula, minúscula y número.</p>
+                <?= errorCampo($errores, 'password') ?>
             </div>
             <div>
                 <label for="password_confirm" class="sr-only">Repetir contraseña</label>
-                <input id="password_confirm" type="password" placeholder="Repeat password" class="<?= $inputClass ?>">
+                <input id="password_confirm" name="password_confirm" type="password" placeholder="Repeat password"
+                       autocomplete="new-password" class="<?= $inputClass ?>">
+                <?= errorCampo($errores, 'password_confirm') ?>
             </div>
 
             <?php include __DIR__ . '/includes/social.php'; ?>

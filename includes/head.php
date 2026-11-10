@@ -1,9 +1,10 @@
+<?php /* Autor: Raul Rubio - Pt04 | Cabecera HTML común (Tailwind por CDN) */ ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= $title ?? 'Umamusume: Pretty Derby' ?></title>
+    <title><?= e($title ?? 'Umamusume: Pretty Derby') ?></title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,3 +24,4 @@
     </script>
 </head>
 <body class="min-h-screen flex flex-col bg-brand-paper font-sans text-black">
+<?php include __DIR__ . '/flash.php'; ?>

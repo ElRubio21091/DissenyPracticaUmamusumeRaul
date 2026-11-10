@@ -20,6 +20,7 @@ vendor/
 *.log
 *.tmp
 
-# Base de datos local 
-*.sqlite
-*.sql
+
+# Imagenes subidas por usuarios (se conserva la carpeta, no su contenido)
+uploads/characters/*
+!uploads/characters/.gitkeep

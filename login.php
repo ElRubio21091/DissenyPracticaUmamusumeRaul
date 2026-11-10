@@ -1,5 +1,15 @@
 <?php
-require __DIR__ . '/includes/helpers.php';
+/**
+ * Autor: Raul Rubio - Pt04
+ * login.php
+ * Formulario de inicio de sesión (la lógica está en controlador/auth.php).
+ */
+require __DIR__ . '/includes/bootstrap.php';
+require __DIR__ . '/controlador/auth.php';
+
+exigirAnonimo();
+$estado  = procesarLogin();
+$errores = $estado['errores'];
 
 $title = 'Login · Umamusume: Pretty Derby';
 include __DIR__ . '/includes/head.php';
@@ -13,15 +23,24 @@ $inputClass = 'w-full rounded-full border border-black bg-white px-5 py-2.5 text
 
         <h1 class="mt-14 text-xl font-bold">Welcome back trainer!</h1>
 
-        <!-- Solo maqueta: el botón lleva al Home, no valida nada -->
-        <form action="index.php" class="mt-8 w-full max-w-[250px] space-y-4">
+        <form action="login.php" method="post" class="mt-8 w-full max-w-[250px] space-y-4" novalidate>
+            <?= campoCsrf() ?>
+
+            <?php if (!empty($errores['general'])): ?>
+                <p class="rounded-2xl border border-red-600 bg-red-100 px-4 py-2 text-xs font-bold text-red-800" role="alert"><?= e($errores['general']) ?></p>
+            <?php endif; ?>
+
             <div>
                 <label for="identifier" class="sr-only">Usuario o email</label>
-                <input id="identifier" type="text" placeholder="Username or email" class="<?= $inputClass ?>">
+                <input id="identifier" name="identifier" type="text" placeholder="Username or email"
+                       value="<?= e($estado['identificador']) ?>" autocomplete="username" class="<?= $inputClass ?>">
+                <?= errorCampo($errores, 'identifier') ?>
             </div>
             <div>
                 <label for="password" class="sr-only">Contraseña</label>
-                <input id="password" type="password" placeholder="Password" class="<?= $inputClass ?>">
+                <input id="password" name="password" type="password" placeholder="Password"
+                       autocomplete="current-password" class="<?= $inputClass ?>">
+                <?= errorCampo($errores, 'password') ?>
             </div>
 
             <?php include __DIR__ . '/includes/social.php'; ?>

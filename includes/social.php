@@ -1,3 +1,4 @@
+<?php /* Autor: Raul Rubio - Pt04 | social.php (parte de la vista) */ ?>
 <div class="flex items-center gap-4">
     <a href="#" aria-label="Google" class="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow ring-1 ring-black/10 transition-transform hover:scale-105">
         <svg viewBox="0 0 48 48" class="h-6 w-6" aria-hidden="true">

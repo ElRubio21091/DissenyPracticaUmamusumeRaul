@@ -1,3 +1,4 @@
+<?php /* Autor: Raul Rubio - Pt04 | logo.php (parte de la vista) */ ?>
 <?php if (asset_exists('assets/img/logo.png')): ?>
     <img src="assets/img/logo.png" alt="Umamusume: Pretty Derby" class="<?= $logoClass ?? 'h-14' ?> w-auto">
 <?php else: ?>

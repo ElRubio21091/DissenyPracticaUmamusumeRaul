@@ -1,0 +1,5 @@
+# Raul Rubio - Pt04
+# En la carpeta de subidas nunca se debe ejecutar PHP, aunque alguien consiguiera colar un fichero.
+<FilesMatch "\.(php|phtml|phar|php[0-9])$">
+    Require all denied
+</FilesMatch>

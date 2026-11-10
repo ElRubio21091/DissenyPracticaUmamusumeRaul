@@ -1,3 +1,4 @@
+<?php /* Autor: Raul Rubio - Pt04 | auth_hero.php (parte de la vista) */ ?>
 <div class="relative hidden lg:block">
     <?php if (asset_exists('assets/img/hero.png')): ?>
         <img src="assets/img/hero.png" alt="" class="absolute inset-0 h-full w-full object-cover">
