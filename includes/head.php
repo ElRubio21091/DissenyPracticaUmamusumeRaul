@@ -16,7 +16,7 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { brand: { blue: '#4543FF', pink: '#D966D6', paper: '#F3F0F0' } },
+                    colors: { brand: { blue: '#4543FF', pink: '#B8349F', paper: '#F3F0F0' } },
                     fontFamily: { sans: ['"M PLUS Rounded 1c"', 'ui-sans-serif', 'system-ui', 'sans-serif'] }
                 }
             }

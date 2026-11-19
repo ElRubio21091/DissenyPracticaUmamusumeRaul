@@ -48,6 +48,16 @@ function obtenerPersonaje(int $id): array|false
     return $stmt->fetch();
 }
 
+/** Outfits de un personaje, en el orden indicado por `ordre` (para el carrusel del detalle). */
+function obtenerOutfits(int $articleId): array
+{
+    $stmt = getConexion()->prepare(
+        'SELECT id, nom, imatge FROM outfits WHERE article_id = :id ORDER BY ordre ASC, id ASC'
+    );
+    $stmt->execute([':id' => $articleId]);
+    return $stmt->fetchAll();
+}
+
 /** Inserta un personaje. Devuelve el id generado. */
 function crearPersonaje(int $usuarioId, string $titol, string $cos, string $va, ?string $imatge): int
 {

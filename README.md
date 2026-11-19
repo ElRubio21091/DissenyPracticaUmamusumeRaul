@@ -40,7 +40,8 @@ Frontend con **Tailwind CSS (CDN)**; backend en **PHP + PDO + MySQL**.
 ## Base de datos (`pt04_raul_rubio`)
 
 - `usuaris` (`id`, `username` UNIQUE, `email` UNIQUE, `password_hash`, `data_registre`)
-- `articles` (`id`, `usuari_id` FK → `usuaris.id` con `ON DELETE CASCADE`, `titol`, `cos`, `va`, `imatge`, `data_creacio`)
+- `articles` (`id`, `usuari_id` FK → `usuaris.id` con `ON DELETE CASCADE`, `titol`, `cos`, `va`, `imatge`, `data_creacio`, y opcionales: `height`, `frase`, `anniversary`, `weight`)
+- `outfits` (`id`, `article_id` FK → `articles.id` con `ON DELETE CASCADE`, `nom`, `imatge`, `ordre`): los trajes que se ven en el carrusel de `personaje.php`
 
 Un *article* es un personaje: `titol` = nombre, `cos` = descripción. `va` (doblador) e `imatge` son campos extra que pedía el diseño.
 

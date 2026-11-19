@@ -17,3 +17,18 @@ INSERT INTO `articles` (`usuari_id`,`titol`,`cos`,`va`,`imatge`) VALUES
 (1,'Twin Turbo','Descripcion de prueba de Twin Turbo. Editala desde la web si eres su autor.','Miharu Hanai','assets/img/characters/twin-turbo.png'),
 (1,'Yamanin Zephyr','Descripcion de prueba de Yamanin Zephyr. Editala desde la web si eres su autor.','Riona Imaizumi','assets/img/characters/yamanin-zephyr.png'),
 (1,'Shinko Windy','Descripcion de prueba de Shinko Windy. Editala desde la web si eres su autor.','Yuuki Takada','assets/img/characters/shinko-windy.png');
+
+-- Datos completos de ejemplo para la pantalla de detalle (Matikanefukukitaru)
+UPDATE `articles` SET
+  `cos` = 'A fortune-telling fanatic and lover of the supernatural, she''s content to leave the outcomes of races and many other things up to luck. If she''s not divining for her own sake, then she''s divining for someone else''s. She places an immense faith in a revelation from a certain god stating that as long as she keeps running, the way forward will open up before her. The name of the cat shaped bag that she carries is "Miss Nya."',
+  `frase` = 'Oho, what''s this I see? Today''s divination: great fortune! ☆',
+  `anniversary` = 'May 22',
+  `height` = 158,
+  `weight` = 'No change because today is my lucky day!'
+WHERE `titol` = 'Matikanefukukitaru';
+
+-- Un outfit por defecto para cada personaje de prueba (usa su imagen actual).
+-- Para probar el carrusel, añade más filas con otro `nom`, otro `imatge` y `ordre` 2, 3...
+INSERT INTO `outfits` (`article_id`,`nom`,`imatge`,`ordre`)
+SELECT `id`, 'Default racewear', `imatge`, 1 FROM `articles` WHERE `imatge` IS NOT NULL;
+

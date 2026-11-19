@@ -73,6 +73,32 @@ function personajeOHome(int $id): array
     return $personaje;
 }
 
+/**
+ * Diapositivas del carrusel de la pantalla de detalle: un outfit por diapositiva.
+ * Si el personaje no tiene outfits (p. ej. los creados desde el formulario),
+ * se usa su imagen principal como única diapositiva. Si no hay ninguna imagen, devuelve [].
+ * Cada diapositiva: ['nom' => ?string, 'imatge' => string].
+ */
+function diapositivasPersonaje(array $personaje): array
+{
+    $diapositivas = [];
+    try {
+        foreach (obtenerOutfits((int) $personaje['id']) as $o) {
+            if (asset_exists($o['imatge'])) {
+                $diapositivas[] = ['nom' => $o['nom'], 'imatge' => $o['imatge']];
+            }
+        }
+    } catch (PDOException $e) {
+        // Si la tabla outfits no existe todavía no rompemos la página: se usa la imagen principal
+        error_log($e->getMessage());
+    }
+
+    if (!$diapositivas && asset_exists($personaje['imatge'])) {
+        $diapositivas[] = ['nom' => null, 'imatge' => $personaje['imatge']];
+    }
+    return $diapositivas;
+}
+
 /** ¿El usuario logueado es el autor de este personaje? */
 function esAutor(array $personaje): bool
 {
