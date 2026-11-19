@@ -1,6 +1,6 @@
 <?php /* Autor: Raul Rubio - Pt04 | Cabecera HTML común (Tailwind por CDN) */ ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">

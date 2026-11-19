@@ -14,20 +14,20 @@ function validarFortalezaPassword(string $password): array
 {
     $errores = [];
     if (mb_strlen($password) < 8) {
-        $errores[] = 'La contraseña debe tener al menos 8 caracteres.';
+        $errores[] = 'The password must be at least 8 characters long.';
     }
     if (!preg_match('/[a-z]/', $password)) {
-        $errores[] = 'La contraseña debe incluir una minúscula.';
+        $errores[] = 'The password must include a lowercase letter.';
     }
     if (!preg_match('/[A-Z]/', $password)) {
-        $errores[] = 'La contraseña debe incluir una mayúscula.';
+        $errores[] = 'The password must include an uppercase letter.';
     }
     if (!preg_match('/\d/', $password)) {
-        $errores[] = 'La contraseña debe incluir un número.';
+        $errores[] = 'The password must include a number.';
     }
     if (strlen($password) > 72) {
         // bcrypt (el algoritmo por defecto) solo usa los primeros 72 bytes
-        $errores[] = 'La contraseña no puede superar los 72 caracteres.';
+        $errores[] = 'The password cannot exceed 72 characters.';
     }
     return $errores;
 }
@@ -38,19 +38,19 @@ function validarRegistro(string $username, string $email, string $password, stri
     $errores = [];
 
     if ($username === '') {
-        $errores['username'] = 'El nombre de usuario es obligatorio.';
+        $errores['username'] = 'Username is required.';
     } elseif (!preg_match('/^[A-Za-z0-9_]{3,30}$/', $username)) {
-        $errores['username'] = 'Usuario de 3 a 30 caracteres: letras, números y guion bajo.';
+        $errores['username'] = 'Username must be 3 to 30 characters: letters, numbers and underscore.';
     }
 
     if ($email === '') {
-        $errores['email'] = 'El email es obligatorio.';
+        $errores['email'] = 'Email is required.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 100) {
-        $errores['email'] = 'El email no es válido.';
+        $errores['email'] = 'The email is not valid.';
     }
 
     if ($password === '') {
-        $errores['password'] = 'La contraseña es obligatoria.';
+        $errores['password'] = 'Password is required.';
     } else {
         $fallos = validarFortalezaPassword($password);
         if ($fallos) {
@@ -59,9 +59,9 @@ function validarRegistro(string $username, string $email, string $password, stri
     }
 
     if ($password2 === '') {
-        $errores['password_confirm'] = 'Repite la contraseña.';
+        $errores['password_confirm'] = 'Repeat the password.';
     } elseif ($password !== $password2) {
-        $errores['password_confirm'] = 'Las contraseñas no coinciden.';
+        $errores['password_confirm'] = 'The passwords do not match.';
     }
 
     return $errores;
@@ -72,10 +72,10 @@ function validarLogin(string $identificador, string $password): array
 {
     $errores = [];
     if ($identificador === '') {
-        $errores['identifier'] = 'Introduce tu usuario o email.';
+        $errores['identifier'] = 'Enter your username or email.';
     }
     if ($password === '') {
-        $errores['password'] = 'Introduce tu contraseña.';
+        $errores['password'] = 'Enter your password.';
     }
     return $errores;
 }
@@ -85,15 +85,15 @@ function validarPersonaje(string $titol, string $cos, string $va): array
 {
     $errores = [];
     if ($titol === '' || mb_strlen($titol) > 100) {
-        $errores['titol'] = 'El nombre es obligatorio (máximo 100 caracteres).';
+        $errores['titol'] = 'Name is required (maximum 100 characters).';
     }
     if ($cos === '') {
-        $errores['cos'] = 'La descripción es obligatoria.';
+        $errores['cos'] = 'Description is required.';
     } elseif (mb_strlen($cos) > 5000) {
-        $errores['cos'] = 'La descripción es demasiado larga (máximo 5000 caracteres).';
+        $errores['cos'] = 'Description is too long (maximum 5000 characters).';
     }
     if ($va === '' || mb_strlen($va) > 100) {
-        $errores['va'] = 'El VA es obligatorio (máximo 100 caracteres).';
+        $errores['va'] = 'VA is required (maximum 100 characters).';
     }
     return $errores;
 }
@@ -109,18 +109,18 @@ function validarImagenSubida(array $archivo): ?string
         return null;
     }
     if ($archivo['error'] === UPLOAD_ERR_INI_SIZE || $archivo['error'] === UPLOAD_ERR_FORM_SIZE) {
-        return 'La imagen supera el tamaño máximo (2 MB).';
+        return 'The image exceeds the maximum size (2 MB).';
     }
     if ($archivo['error'] !== UPLOAD_ERR_OK) {
-        return 'No se ha podido subir la imagen.';
+        return 'The image could not be uploaded.';
     }
     if ($archivo['size'] > IMAGEN_MAX_BYTES) {
-        return 'La imagen supera el tamaño máximo (2 MB).';
+        return 'The image exceeds the maximum size (2 MB).';
     }
 
     $mime = (new finfo(FILEINFO_MIME_TYPE))->file($archivo['tmp_name']);
     if (!isset(IMAGEN_TIPOS[$mime]) || @getimagesize($archivo['tmp_name']) === false) {
-        return 'La imagen debe ser JPG, PNG o WEBP.';
+        return 'The image must be JPG, PNG or WEBP.';
     }
     return null;
 }

@@ -27,7 +27,7 @@ function getConexion(): PDO
         } catch (PDOException $e) {
             // Detalle técnico al log, mensaje genérico a pantalla
             error_log('Error de conexión: ' . $e->getMessage());
-            die('No se ha podido conectar con la base de datos.');
+            die('Could not connect to the database.');
         }
     }
 

@@ -31,7 +31,7 @@ include __DIR__ . '/includes/header.php';
 
         <article>
             <h1 class="text-3xl font-bold"><?= e($p['titol']) ?></h1>
-            <p class="mt-1 text-xs text-gray-600">Creado por <strong><?= e($p['autor']) ?></strong></p>
+            <p class="mt-1 text-xs text-gray-600">Created by <strong><?= e($p['autor']) ?></strong></p>
             <!-- nl2br respeta los saltos de línea; e() evita XSS -->
             <p class="mt-6 leading-relaxed"><?= nl2br(e($p['cos'])) ?></p>
 
@@ -39,7 +39,7 @@ include __DIR__ . '/includes/header.php';
                 <a href="index.php" class="rounded-full border border-black bg-white px-5 py-1.5 hover:bg-brand-pink/20">&laquo; Back</a>
                 <?php if ($esAutor): ?>
                     <a href="personaje_form.php?id=<?= (int) $p['id'] ?>" class="rounded-full border border-black bg-brand-pink px-5 py-1.5 text-white hover:brightness-110">Edit</a>
-                    <form action="personaje_borrar.php" method="post" onsubmit="return confirm('¿Seguro que quieres borrar este personaje?');">
+                    <form action="personaje_borrar.php" method="post" onsubmit="return confirm('Are you sure you want to delete this character?');">
                         <?= campoCsrf() ?>
                         <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
                         <button type="submit" class="rounded-full border border-red-600 bg-white px-5 py-1.5 text-red-600 hover:bg-red-50">Delete</button>

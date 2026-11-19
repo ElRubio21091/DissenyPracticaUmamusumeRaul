@@ -21,7 +21,7 @@ $inputClass = 'w-full rounded-full border border-black bg-white px-5 py-2.5 text
 
 <main class="grid flex-1 lg:grid-cols-[35%_1fr]">
     <section class="flex flex-col items-center px-8 py-10">
-        <a href="index.php" aria-label="Inicio"><?php $logoClass = 'h-20'; include __DIR__ . '/includes/logo.php'; ?></a>
+        <a href="index.php" aria-label="Home"><?php $logoClass = 'h-20'; include __DIR__ . '/includes/logo.php'; ?></a>
 
         <h1 class="mt-10 text-xl font-bold">Welcome new trainer!</h1>
 
@@ -33,7 +33,7 @@ $inputClass = 'w-full rounded-full border border-black bg-white px-5 py-2.5 text
             <?php endif; ?>
 
             <div>
-                <label for="username" class="sr-only">Usuario</label>
+                <label for="username" class="sr-only">Username</label>
                 <input id="username" name="username" type="text" placeholder="Username" maxlength="30"
                        value="<?= e($datos['username']) ?>" autocomplete="username" class="<?= $inputClass ?>">
                 <?= errorCampo($errores, 'username') ?>
@@ -45,14 +45,14 @@ $inputClass = 'w-full rounded-full border border-black bg-white px-5 py-2.5 text
                 <?= errorCampo($errores, 'email') ?>
             </div>
             <div>
-                <label for="password" class="sr-only">Contraseña</label>
+                <label for="password" class="sr-only">Password</label>
                 <input id="password" name="password" type="password" placeholder="Password"
                        autocomplete="new-password" class="<?= $inputClass ?>">
-                <p class="mt-1 px-3 text-[11px] text-gray-600">Mín. 8 caracteres, con mayúscula, minúscula y número.</p>
+                <p class="mt-1 px-3 text-[11px] text-gray-600">Min. 8 characters, with an uppercase letter, a lowercase letter and a number.</p>
                 <?= errorCampo($errores, 'password') ?>
             </div>
             <div>
-                <label for="password_confirm" class="sr-only">Repetir contraseña</label>
+                <label for="password_confirm" class="sr-only">Repeat password</label>
                 <input id="password_confirm" name="password_confirm" type="password" placeholder="Repeat password"
                        autocomplete="new-password" class="<?= $inputClass ?>">
                 <?= errorCampo($errores, 'password_confirm') ?>

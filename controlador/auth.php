@@ -32,7 +32,7 @@ function procesarRegistro(): array
     $estado['datos'] = ['username' => $username, 'email' => $email];
 
     if (!csrfValido()) {
-        $estado['errores']['general'] = 'Formulario caducado. Inténtalo de nuevo.';
+        $estado['errores']['general'] = 'Form expired. Please try again.';
         return $estado;
     }
 
@@ -41,10 +41,10 @@ function procesarRegistro(): array
     // Comprobamos que el usuario no exista ya (solo si el formato es correcto)
     try {
         if (!isset($errores['username']) && existeUsername($username)) {
-            $errores['username'] = 'Ese nombre de usuario ya está en uso.';
+            $errores['username'] = 'That username is already taken.';
         }
         if (!isset($errores['email']) && existeEmail($email)) {
-            $errores['email'] = 'Ese email ya está registrado.';
+            $errores['email'] = 'That email is already registered.';
         }
 
         if (!$errores) {
@@ -55,18 +55,18 @@ function procesarRegistro(): array
             } catch (PDOException $e) {
                 // 23000 = violación de UNIQUE: dos registros simultáneos con el mismo dato
                 if ($e->getCode() === '23000') {
-                    $estado['errores']['general'] = 'Ese usuario o email ya existe.';
+                    $estado['errores']['general'] = 'That username or email already exists.';
                     return $estado;
                 }
                 throw $e;
             }
             loguearUsuario(['id' => $id, 'username' => $username]);
-            flash('ok', '¡Bienvenido, ' . $username . '! Tu cuenta se ha creado.');
+            flash('ok', 'Welcome, ' . $username . '! Your account has been created.');
             redirigir('index.php');
         }
     } catch (PDOException $e) {
         error_log($e->getMessage());
-        $errores['general'] = 'No se ha podido completar el registro. Inténtalo más tarde.';
+        $errores['general'] = 'Registration could not be completed. Please try again later.';
     }
 
     $estado['errores'] = $errores;
@@ -94,7 +94,7 @@ function procesarLogin(): array
     $estado['identificador'] = $identificador;
 
     if (!csrfValido()) {
-        $estado['errores']['general'] = 'Formulario caducado. Inténtalo de nuevo.';
+        $estado['errores']['general'] = 'Form expired. Please try again.';
         return $estado;
     }
 
@@ -105,15 +105,15 @@ function procesarLogin(): array
             $usuario = buscarUsuarioPorIdentificador($identificador);
             // Mismo mensaje si falla el usuario o la contraseña: no revelamos cuál de los dos es
             if (!$usuario || !password_verify($password, $usuario['password_hash'])) {
-                $errores['general'] = 'Usuario o contraseña incorrectos.';
+                $errores['general'] = 'Incorrect username or password.';
             } else {
                 loguearUsuario($usuario);
-                flash('ok', 'Sesión iniciada. ¡Hola, ' . $usuario['username'] . '!');
+                flash('ok', 'Logged in. Hello, ' . $usuario['username'] . '!');
                 redirigir('index.php');
             }
         } catch (PDOException $e) {
             error_log($e->getMessage());
-            $errores['general'] = 'No se ha podido iniciar sesión. Inténtalo más tarde.';
+            $errores['general'] = 'Login failed. Please try again later.';
         }
     }
 
@@ -128,7 +128,7 @@ function procesarLogout(): void
         cerrarSesion();
         // Tras destruir la sesión hay que abrir otra para poder dejar un mensaje
         iniciarSesion();
-        flash('ok', 'Has cerrado sesión.');
+        flash('ok', 'You have logged out.');
     }
     redirigir('index.php');
 }

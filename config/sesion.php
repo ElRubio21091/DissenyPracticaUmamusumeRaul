@@ -37,7 +37,7 @@ function iniciarSesion(): void
         session_unset();
         session_destroy();
         session_start();
-        flash('error', 'Tu sesión ha caducado. Vuelve a iniciar sesión.');
+        flash('error', 'Your session has expired. Please log in again.');
     }
     $_SESSION['ultima_actividad'] = time();
 
@@ -102,7 +102,7 @@ function usuarioNombre(): ?string
 function exigirLogin(): void
 {
     if (!estaLogueado()) {
-        flash('error', 'Debes iniciar sesión para hacer eso.');
+        flash('error', 'You must log in to do that.');
         redirigir('login.php');
     }
 }

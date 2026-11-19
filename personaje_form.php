@@ -55,8 +55,8 @@ $inputClass = 'w-full rounded-full border border-black bg-white px-5 py-2.5 text
         <div>
             <label for="imatge" class="mb-1 block px-3 text-xs font-bold">Image (JPG, PNG or WEBP, max 2 MB)</label>
             <?php if ($editando && asset_exists($datos['imatge'] ?? null)): ?>
-                <img src="<?= e($datos['imatge']) ?>" alt="Imagen actual" class="mb-2 ml-3 h-24 w-auto border border-black">
-                <p class="mb-1 px-3 text-[11px] text-gray-600">Sube otra solo si quieres cambiarla.</p>
+                <img src="<?= e($datos['imatge']) ?>" alt="Current image" class="mb-2 ml-3 h-24 w-auto border border-black">
+                <p class="mb-1 px-3 text-[11px] text-gray-600">Upload another one only if you want to change it.</p>
             <?php endif; ?>
             <input id="imatge" name="imatge" type="file" accept="image/jpeg,image/png,image/webp"
                    class="w-full rounded-full border border-black bg-white px-5 py-2 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-pink file:px-4 file:py-1 file:text-xs file:font-bold file:text-white">

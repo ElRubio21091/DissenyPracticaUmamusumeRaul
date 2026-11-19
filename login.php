@@ -19,7 +19,7 @@ $inputClass = 'w-full rounded-full border border-black bg-white px-5 py-2.5 text
 
 <main class="grid flex-1 lg:grid-cols-[35%_1fr]">
     <section class="flex flex-col items-center px-8 py-10">
-        <a href="index.php" aria-label="Inicio"><?php $logoClass = 'h-20'; include __DIR__ . '/includes/logo.php'; ?></a>
+        <a href="index.php" aria-label="Home"><?php $logoClass = 'h-20'; include __DIR__ . '/includes/logo.php'; ?></a>
 
         <h1 class="mt-14 text-xl font-bold">Welcome back trainer!</h1>
 
@@ -31,13 +31,13 @@ $inputClass = 'w-full rounded-full border border-black bg-white px-5 py-2.5 text
             <?php endif; ?>
 
             <div>
-                <label for="identifier" class="sr-only">Usuario o email</label>
+                <label for="identifier" class="sr-only">Username or email</label>
                 <input id="identifier" name="identifier" type="text" placeholder="Username or email"
                        value="<?= e($estado['identificador']) ?>" autocomplete="username" class="<?= $inputClass ?>">
                 <?= errorCampo($errores, 'identifier') ?>
             </div>
             <div>
-                <label for="password" class="sr-only">Contraseña</label>
+                <label for="password" class="sr-only">Password</label>
                 <input id="password" name="password" type="password" placeholder="Password"
                        autocomplete="current-password" class="<?= $inputClass ?>">
                 <?= errorCampo($errores, 'password') ?>

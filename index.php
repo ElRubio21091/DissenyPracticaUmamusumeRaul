@@ -40,10 +40,10 @@ include __DIR__ . '/includes/header.php';
         <h1 class="text-[length:clamp(26px,1.878vw,48px)] font-bold leading-none">CHARACTERS</h1>
 
         <form action="index.php" method="get" class="flex w-56 items-center gap-3">
-            <label for="q" class="sr-only">Buscar personaje</label>
+            <label for="q" class="sr-only">Search character</label>
             <input id="q" name="q" type="search" placeholder="Search" value="<?= e($busqueda) ?>"
                    class="w-full rounded-full border border-black bg-white px-4 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-pink">
-            <button type="submit" aria-label="Buscar"
+            <button type="submit" aria-label="Search"
                     class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black bg-white hover:bg-brand-pink/20">
                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
@@ -57,11 +57,11 @@ include __DIR__ . '/includes/header.php';
     <?php if (empty($personajes)): ?>
         <p class="mt-10 text-center text-sm font-bold">
             <?php if ($busqueda !== ''): ?>
-                No hay personajes que coincidan con «<?= e($busqueda) ?>».
-                <a href="index.php" class="text-brand-pink hover:underline">Ver todos</a>
+                No characters match "<?= e($busqueda) ?>".
+                <a href="index.php" class="text-brand-pink hover:underline">See all</a>
             <?php else: ?>
-                Todavía no hay personajes.
-                <a href="login.php" class="text-brand-pink hover:underline">Inicia sesión</a> para crear el primero.
+                There are no characters yet.
+                <a href="login.php" class="text-brand-pink hover:underline">Log in</a> to create the first one.
             <?php endif; ?>
         </p>
     <?php else: ?>
@@ -90,7 +90,7 @@ include __DIR__ . '/includes/header.php';
                         <!-- Solo el autor ve estas acciones -->
                         <div class="mx-auto mt-1 flex w-full max-w-[160px] items-center justify-center gap-2 text-xs font-bold xl:mx-0 xl:max-w-none">
                             <a href="personaje_form.php?id=<?= (int) $c['id'] ?>" class="rounded-full border border-black bg-white px-3 py-0.5 hover:bg-brand-pink/20">Edit</a>
-                            <form action="personaje_borrar.php" method="post" onsubmit="return confirm('¿Seguro que quieres borrar este personaje?');">
+                            <form action="personaje_borrar.php" method="post" onsubmit="return confirm('Are you sure you want to delete this character?');">
                                 <?= campoCsrf() ?>
                                 <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
                                 <button type="submit" class="rounded-full border border-black bg-white px-3 py-0.5 text-red-600 hover:bg-red-50">Delete</button>
@@ -105,17 +105,17 @@ include __DIR__ . '/includes/header.php';
     <!-- DIV 2: estado de los botones Anterior / Següent -->
     <div id="paginacio" class="mt-10 flex items-center justify-center gap-4 text-sm font-bold">
         <?php if ($hayAnterior): ?>
-            <a href="<?= e(urlPagina($pagina - 1, $busqueda)) ?>" class="rounded-full border border-black bg-brand-pink px-5 py-1.5 text-white hover:brightness-110">&laquo; Anterior</a>
+            <a href="<?= e(urlPagina($pagina - 1, $busqueda)) ?>" class="rounded-full border border-black bg-brand-pink px-5 py-1.5 text-white hover:brightness-110">&laquo; Previous</a>
         <?php else: ?>
-            <span aria-disabled="true" class="cursor-not-allowed rounded-full border border-gray-400 bg-gray-200 px-5 py-1.5 text-gray-500">&laquo; Anterior</span>
+            <span aria-disabled="true" class="cursor-not-allowed rounded-full border border-gray-400 bg-gray-200 px-5 py-1.5 text-gray-500">&laquo; Previous</span>
         <?php endif; ?>
 
-        <span>Página <?= $pagina ?> de <?= $totalPaginas ?></span>
+        <span>Page <?= $pagina ?> of <?= $totalPaginas ?></span>
 
         <?php if ($haySiguiente): ?>
-            <a href="<?= e(urlPagina($pagina + 1, $busqueda)) ?>" class="rounded-full border border-black bg-brand-pink px-5 py-1.5 text-white hover:brightness-110">Següent &raquo;</a>
+            <a href="<?= e(urlPagina($pagina + 1, $busqueda)) ?>" class="rounded-full border border-black bg-brand-pink px-5 py-1.5 text-white hover:brightness-110">Next &raquo;</a>
         <?php else: ?>
-            <span aria-disabled="true" class="cursor-not-allowed rounded-full border border-gray-400 bg-gray-200 px-5 py-1.5 text-gray-500">Següent &raquo;</span>
+            <span aria-disabled="true" class="cursor-not-allowed rounded-full border border-gray-400 bg-gray-200 px-5 py-1.5 text-gray-500">Next &raquo;</span>
         <?php endif; ?>
     </div>
 

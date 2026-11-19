@@ -27,7 +27,7 @@ function datosHome(): array
         // Sin ningún personaje en toda la BDD: redirigimos a crear el primero
         $total = contarPersonajes($busqueda);
         if ($busqueda === '' && $total === 0 && estaLogueado()) {
-            flash('error', 'Todavía no hay personajes. ¡Crea el primero!');
+            flash('error', 'There are no characters yet. Create the first one!');
             redirigir('personaje_form.php');
         }
 
@@ -53,7 +53,7 @@ function datosHome(): array
         ];
     } catch (PDOException $e) {
         error_log($e->getMessage());
-        die('No se han podido cargar los personajes.');
+        die('Characters could not be loaded.');
     }
 }
 
@@ -64,10 +64,10 @@ function personajeOHome(int $id): array
         $personaje = obtenerPersonaje($id);
     } catch (PDOException $e) {
         error_log($e->getMessage());
-        die('No se ha podido cargar el personaje.');
+        die('The character could not be loaded.');
     }
     if (!$personaje) {
-        flash('error', 'El personaje no existe.');
+        flash('error', 'The character does not exist.');
         redirigir('index.php');
     }
     return $personaje;
@@ -95,7 +95,7 @@ function procesarFormularioPersonaje(int $id): array
     if ($editando) {
         $actual = personajeOHome($id);
         if (!esAutor($actual)) {
-            flash('error', 'Solo puedes editar tus propios personajes.');
+            flash('error', 'You can only edit your own characters.');
             redirigir('index.php');
         }
         $datos = $actual;
@@ -115,7 +115,7 @@ function procesarFormularioPersonaje(int $id): array
     $resultado['datos'] = array_merge($datos, ['titol' => $titol, 'cos' => $cos, 'va' => $va]);
 
     if (!csrfValido()) {
-        $resultado['errores']['general'] = 'Formulario caducado (o fichero demasiado grande). Inténtalo de nuevo.';
+        $resultado['errores']['general'] = 'Form expired (or file too large). Please try again.';
         return $resultado;
     }
 
@@ -140,15 +140,15 @@ function procesarFormularioPersonaje(int $id): array
             if ($rutaNueva !== null) {
                 borrarImagenSubida($datos['imatge']);
             }
-            flash('ok', 'Personaje actualizado.');
+            flash('ok', 'Character updated.');
         } else {
             crearPersonaje(usuarioId(), $titol, $cos, $va, $rutaNueva);
-            flash('ok', 'Personaje creado.');
+            flash('ok', 'Character created.');
         }
         redirigir('index.php');
     } catch (PDOException $e) {
         error_log($e->getMessage());
-        $resultado['errores']['general'] = 'No se ha podido guardar el personaje. Inténtalo más tarde.';
+        $resultado['errores']['general'] = 'The character could not be saved. Please try again later.';
     }
 
     return $resultado;
@@ -160,7 +160,7 @@ function procesarBorradoPersonaje(): void
     exigirLogin();
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrfValido()) {
-        flash('error', 'Petición no válida.');
+        flash('error', 'Invalid request.');
         redirigir('index.php');
     }
 
@@ -169,18 +169,18 @@ function procesarBorradoPersonaje(): void
     try {
         $personaje = obtenerPersonaje($id);
         if (!$personaje) {
-            flash('error', 'El personaje no existe.');
+            flash('error', 'The character does not exist.');
         } elseif (!esAutor($personaje)) {
-            flash('error', 'Solo puedes borrar tus propios personajes.');
+            flash('error', 'You can only delete your own characters.');
         } elseif (borrarPersonaje($id, usuarioId())) {
             borrarImagenSubida($personaje['imatge']);
-            flash('ok', 'Personaje borrado.');
+            flash('ok', 'Character deleted.');
         } else {
-            flash('error', 'No se ha podido borrar.');
+            flash('error', 'Could not delete.');
         }
     } catch (PDOException $e) {
         error_log($e->getMessage());
-        flash('error', 'No se ha podido borrar.');
+        flash('error', 'Could not delete.');
     }
     redirigir('index.php');
 }
@@ -202,10 +202,10 @@ function guardarImagenSubida(array $archivo): ?string
 
     $carpeta = dirname(__DIR__) . '/' . CARPETA_SUBIDAS;
     if (!is_dir($carpeta) && !mkdir($carpeta, 0755, true)) {
-        throw new RuntimeException('No se puede crear la carpeta de subidas.');
+        throw new RuntimeException('The uploads folder cannot be created.');
     }
     if (!move_uploaded_file($archivo['tmp_name'], $carpeta . $nombre)) {
-        throw new RuntimeException('No se ha podido guardar la imagen.');
+        throw new RuntimeException('The image could not be saved.');
     }
     return CARPETA_SUBIDAS . $nombre;
 }
