@@ -50,7 +50,7 @@ CREATE TABLE `articles` (
 
 -- --------------------------------------------------------
 -- Tabla `outfits`: los trajes de cada personaje (diapositivas del carrusel del detalle)
---   ordre = posición en el carrusel (de menor a mayor)
+--   ordre = posición en el carrusel (de menor a mayor); no puede repetirse dentro de un mismo personaje
 -- --------------------------------------------------------
 CREATE TABLE `outfits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -59,7 +59,7 @@ CREATE TABLE `outfits` (
   `imatge` varchar(255) NOT NULL,                 -- ruta relativa de la imagen
   `ordre` tinyint(3) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  KEY `idx_article` (`article_id`),
+  UNIQUE KEY `uq_article_ordre` (`article_id`,`ordre`),   -- también sirve de índice para la clave foránea
   CONSTRAINT `fk_outfits_articles` FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
