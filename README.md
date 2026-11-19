@@ -12,6 +12,10 @@ Frontend con **Tailwind CSS (CDN)**; backend en **PHP + PDO + MySQL**.
 3. Servir la carpeta con Apache/XAMPP (usuario `root`, sin contraseña, como pide el enunciado). Abrir `index.php`.
 4. La carpeta `uploads/characters/` necesita permiso de escritura (las imágenes que suben los usuarios).
 
+**Requisitos:** PHP 8 con las extensiones `pdo_mysql`, `mbstring` y `fileinfo` (XAMPP las trae activadas) y MySQL/MariaDB.
+**Se necesita conexión a internet**: Tailwind CSS y la tipografía (Google Fonts) se cargan por CDN.
+Las imágenes de los personajes de prueba están en `assets/img/characters/` (incluidas en el repositorio). Solo se ignora el contenido de `uploads/characters/`, que son las imágenes que suben los usuarios mientras usan la web.
+
 ## Qué hace
 
 | Requisito del enunciado | Cómo está resuelto |
@@ -27,6 +31,8 @@ Frontend con **Tailwind CSS (CDN)**; backend en **PHP + PDO + MySQL**.
 | Sesión activa al menos 40 min | Sesión de **45 min de inactividad**, renovada en cada petición (`config/sesion.php`). |
 | Editar solo los posts propios | Doble control: la vista solo muestra los botones al autor, el controlador comprueba la autoría y las consultas `UPDATE`/`DELETE` incluyen `AND usuari_id = :u`. Aunque alguien forzara la URL, el SQL no tocaría posts ajenos. |
 | Paginación (de la Pt03) | 10 por página (2 filas × 5, como el diseño), página por defecto 1, `Anterior`/`Següent` deshabilitados en los extremos, y dos `div` (`#articles` y `#paginacio`). Funciona junto con el buscador. |
+| Formulario de crear / editar | `personaje_form.php`: nombre, VA, descripción e imagen principal, más los datos opcionales de *General info* (frase, cumpleaños, altura, peso) y la gestión de **outfits** (renombrar, cambiar imagen, borrar y añadir hasta 3 nuevos por envío, máximo 10 por personaje). Todo se guarda en una transacción; si algo falla, se deshacen los cambios y las imágenes recién subidas. |
+| Detalle del personaje | `personaje.php`: carrusel de outfits accesible (botones reales, `aria-live`), VA, frase, General Info y descripción. |
 | Funciones | Toda la lógica está en funciones (`modelo/`, `controlador/`, `config/`). |
 | Git | Repositorio Git. Cada fichero lleva mi nombre y el código está comentado. |
 

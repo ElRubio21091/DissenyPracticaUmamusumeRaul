@@ -58,28 +58,47 @@ function obtenerOutfits(int $articleId): array
     return $stmt->fetchAll();
 }
 
-/** Inserta un personaje. Devuelve el id generado. */
-function crearPersonaje(int $usuarioId, string $titol, string $cos, string $va, ?string $imatge): int
+/** Valor de texto vacío -> NULL (las columnas opcionales de la BDD admiten NULL). */
+function textoONull(string $valor): ?string
+{
+    return $valor === '' ? null : $valor;
+}
+
+/**
+ * Inserta un personaje. $extra trae frase, anniversary, height y weight (opcionales, '' = sin dato).
+ * Devuelve el id generado.
+ */
+function crearPersonaje(int $usuarioId, string $titol, string $cos, string $va, ?string $imatge, array $extra): int
 {
     $pdo  = getConexion();
     $stmt = $pdo->prepare(
-        'INSERT INTO articles (usuari_id, titol, cos, va, imatge)
-         VALUES (:u, :titol, :cos, :va, :imatge)'
+        'INSERT INTO articles (usuari_id, titol, cos, va, imatge, frase, anniversary, height, weight)
+         VALUES (:u, :titol, :cos, :va, :imatge, :frase, :anniversary, :height, :weight)'
     );
-    $stmt->execute([':u' => $usuarioId, ':titol' => $titol, ':cos' => $cos, ':va' => $va, ':imatge' => $imatge]);
+    $stmt->execute([
+        ':u' => $usuarioId, ':titol' => $titol, ':cos' => $cos, ':va' => $va, ':imatge' => $imatge,
+        ':frase' => textoONull($extra['frase']), ':anniversary' => textoONull($extra['anniversary']),
+        ':height' => $extra['height'] === '' ? null : (int) $extra['height'], ':weight' => textoONull($extra['weight']),
+    ]);
     return (int) $pdo->lastInsertId();
 }
 
 /**
  * Modifica un personaje SOLO si pertenece al usuario.
- * Si $imatge es null no se toca la imagen actual.
+ * Si $imatge es null no se toca la imagen actual. Los campos de $extra se guardan siempre
+ * (así se puede vaciar un dato dejando el campo en blanco).
  */
-function modificarPersonaje(int $id, int $usuarioId, string $titol, string $cos, string $va, ?string $imatge): bool
+function modificarPersonaje(int $id, int $usuarioId, string $titol, string $cos, string $va, ?string $imatge, array $extra): bool
 {
-    $sql = 'UPDATE articles SET titol = :titol, cos = :cos, va = :va'
+    $sql = 'UPDATE articles SET titol = :titol, cos = :cos, va = :va,
+                   frase = :frase, anniversary = :anniversary, height = :height, weight = :weight'
          . ($imatge !== null ? ', imatge = :imatge' : '')
          . ' WHERE id = :id AND usuari_id = :u';
-    $params = [':titol' => $titol, ':cos' => $cos, ':va' => $va, ':id' => $id, ':u' => $usuarioId];
+    $params = [
+        ':titol' => $titol, ':cos' => $cos, ':va' => $va, ':id' => $id, ':u' => $usuarioId,
+        ':frase' => textoONull($extra['frase']), ':anniversary' => textoONull($extra['anniversary']),
+        ':height' => $extra['height'] === '' ? null : (int) $extra['height'], ':weight' => textoONull($extra['weight']),
+    ];
     if ($imatge !== null) {
         $params[':imatge'] = $imatge;
     }
@@ -89,12 +108,63 @@ function modificarPersonaje(int $id, int $usuarioId, string $titol, string $cos,
     return true;
 }
 
-/** Borra un personaje SOLO si pertenece al usuario. true si se borró. */
+/**
+ * Borra un personaje SOLO si pertenece al usuario. true si se borró.
+ * También borra sus outfits explícitamente (por si la BDD no tuviera el ON DELETE CASCADE).
+ */
 function borrarPersonaje(int $id, int $usuarioId): bool
 {
-    $stmt = getConexion()->prepare('DELETE FROM articles WHERE id = :id AND usuari_id = :u');
-    $stmt->execute([':id' => $id, ':u' => $usuarioId]);
-    return $stmt->rowCount() > 0;
+    $pdo = getConexion();
+    $pdo->beginTransaction();
+    try {
+        $stmt = $pdo->prepare('DELETE FROM articles WHERE id = :id AND usuari_id = :u');
+        $stmt->execute([':id' => $id, ':u' => $usuarioId]);
+        $borrado = $stmt->rowCount() > 0;
+        if ($borrado) {
+            $pdo->prepare('DELETE FROM outfits WHERE article_id = :id')->execute([':id' => $id]);
+        }
+        $pdo->commit();
+        return $borrado;
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        throw $e;
+    }
+}
+
+/** Siguiente posición libre en el carrusel de un personaje. */
+function siguienteOrdreOutfit(int $articleId): int
+{
+    $stmt = getConexion()->prepare('SELECT COALESCE(MAX(ordre), 0) + 1 FROM outfits WHERE article_id = :id');
+    $stmt->execute([':id' => $articleId]);
+    return (int) $stmt->fetchColumn();
+}
+
+/** Añade un outfit a un personaje. */
+function crearOutfit(int $articleId, string $nom, string $imatge, int $ordre): void
+{
+    $stmt = getConexion()->prepare(
+        'INSERT INTO outfits (article_id, nom, imatge, ordre) VALUES (:a, :nom, :imatge, :ordre)'
+    );
+    $stmt->execute([':a' => $articleId, ':nom' => $nom, ':imatge' => $imatge, ':ordre' => $ordre]);
+}
+
+/** Cambia el nombre (y la imagen, si $imatge no es null) de un outfit del personaje indicado. */
+function modificarOutfit(int $id, int $articleId, string $nom, ?string $imatge): void
+{
+    $sql = 'UPDATE outfits SET nom = :nom' . ($imatge !== null ? ', imatge = :imatge' : '')
+         . ' WHERE id = :id AND article_id = :a';
+    $params = [':nom' => $nom, ':id' => $id, ':a' => $articleId];
+    if ($imatge !== null) {
+        $params[':imatge'] = $imatge;
+    }
+    getConexion()->prepare($sql)->execute($params);
+}
+
+/** Borra un outfit del personaje indicado. */
+function borrarOutfit(int $id, int $articleId): void
+{
+    getConexion()->prepare('DELETE FROM outfits WHERE id = :id AND article_id = :a')
+        ->execute([':id' => $id, ':a' => $articleId]);
 }
 
 /** Escapa % y _ para que el usuario no pueda usarlos como comodines en el LIKE. */

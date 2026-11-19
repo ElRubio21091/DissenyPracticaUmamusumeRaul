@@ -124,3 +124,46 @@ function validarImagenSubida(array $archivo): ?string
     }
     return null;
 }
+
+/**
+ * Valida los datos opcionales de "General Info" (frase, cumpleaños, altura y peso).
+ * Todos pueden ir vacíos; si traen algo, se comprueba longitud / rango.
+ */
+function validarDatosExtra(array $extra): array
+{
+    $errores = [];
+    if (mb_strlen($extra['frase']) > 255) {
+        $errores['frase'] = 'The quote is too long (maximum 255 characters).';
+    }
+    if (mb_strlen($extra['anniversary']) > 30) {
+        $errores['anniversary'] = 'Birthday is too long (maximum 30 characters).';
+    }
+    if ($extra['height'] !== '' && (!ctype_digit($extra['height']) || (int) $extra['height'] < 50 || (int) $extra['height'] > 300)) {
+        $errores['height'] = 'Height must be a whole number of cm between 50 and 300.';
+    }
+    if (mb_strlen($extra['weight']) > 150) {
+        $errores['weight'] = 'Weight is too long (maximum 150 characters).';
+    }
+    return $errores;
+}
+
+/**
+ * Valida un outfit: nombre obligatorio (máx. 100) e imagen válida.
+ * La imagen es obligatoria al crearlo y opcional al editar (si no se sube, se conserva la actual).
+ * Devuelve ['nom' => ..., 'imatge' => ...] solo con los campos que fallan.
+ */
+function validarOutfit(string $nom, array $archivo, bool $imagenObligatoria): array
+{
+    $errores = [];
+    if ($nom === '' || mb_strlen($nom) > 100) {
+        $errores['nom'] = 'Outfit name is required (maximum 100 characters).';
+    }
+    $sinArchivo = ($archivo['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE;
+    if ($sinArchivo && $imagenObligatoria) {
+        $errores['imatge'] = 'Choose an image for this outfit.';
+    } elseif ($errorImg = validarImagenSubida($archivo)) {
+        $errores['imatge'] = $errorImg;
+    }
+    return $errores;
+}
+

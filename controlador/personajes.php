@@ -13,6 +13,9 @@ require_once __DIR__ . '/validacions.php';
 const PERSONAJES_POR_PAGINA = 10;
 /** Carpeta (relativa a la raíz web) donde se guardan las imágenes subidas. */
 const CARPETA_SUBIDAS = 'uploads/characters/';
+/** Máximo de outfits por personaje y huecos vacíos para añadir nuevos en cada envío del formulario. */
+const OUTFITS_MAX = 10;
+const OUTFITS_NUEVOS_POR_FORM = 3;
 
 /**
  * Prepara los datos de la Home: personajes de la página actual, paginación y búsqueda.
@@ -105,10 +108,39 @@ function esAutor(array $personaje): bool
     return estaLogueado() && (int) $personaje['usuari_id'] === usuarioId();
 }
 
+/** Texto de un campo POST (si alguien manda un array o algo raro, se trata como vacío). */
+function textoPost(mixed $valor): string
+{
+    return is_string($valor) ? trim($valor) : '';
+}
+
 /**
- * Gestiona el formulario de crear / editar un personaje.
+ * Reorganiza $_FILES['campo'] cuando el input se llama campo[clave]:
+ * PHP lo entrega "transpuesto"; aquí se devuelve [clave => ['name'=>..., 'tmp_name'=>..., 'error'=>..., ...]].
+ */
+function archivosPorClave(string $campo): array
+{
+    $f = $_FILES[$campo] ?? null;
+    if (!$f || !is_array($f['name'] ?? null)) {
+        return [];
+    }
+    $porClave = [];
+    foreach (array_keys($f['name']) as $clave) {
+        $porClave[$clave] = [
+            'name'     => $f['name'][$clave],
+            'type'     => $f['type'][$clave] ?? '',
+            'tmp_name' => $f['tmp_name'][$clave] ?? '',
+            'error'    => $f['error'][$clave] ?? UPLOAD_ERR_NO_FILE,
+            'size'     => $f['size'][$clave] ?? 0,
+        ];
+    }
+    return $porClave;
+}
+
+/**
+ * Gestiona el formulario de crear / editar un personaje (con sus datos de General Info y sus outfits).
  * $id = 0 => alta. $id > 0 => edición (solo si eres el autor).
- * Devuelve ['errores' => [...], 'datos' => [...], 'editando' => bool].
+ * Devuelve ['errores', 'datos', 'editando', 'outfits' (los ya guardados), 'nuevos' (huecos para añadir)].
  * Si se guarda bien, redirige y no vuelve.
  */
 function procesarFormularioPersonaje(int $id): array
@@ -116,7 +148,9 @@ function procesarFormularioPersonaje(int $id): array
     exigirLogin();
 
     $editando = $id > 0;
-    $datos    = ['titol' => '', 'cos' => '', 'va' => '', 'imatge' => null];
+    $datos    = ['titol' => '', 'cos' => '', 'va' => '', 'imatge' => null,
+                 'frase' => '', 'anniversary' => '', 'height' => '', 'weight' => ''];
+    $outfitsActuales = [];   // id => fila de la BDD (solo los de ESTE personaje)
 
     if ($editando) {
         $actual = personajeOHome($id);
@@ -125,9 +159,24 @@ function procesarFormularioPersonaje(int $id): array
             redirigir('index.php');
         }
         $datos = $actual;
+        try {
+            foreach (obtenerOutfits($id) as $o) {
+                $outfitsActuales[(int) $o['id']] = $o;
+            }
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+        }
     }
 
-    $resultado = ['errores' => [], 'datos' => $datos, 'editando' => $editando];
+    // Lo que pinta el formulario en la sección Outfits
+    $vistaOutfits = [];
+    foreach ($outfitsActuales as $oid => $o) {
+        $vistaOutfits[$oid] = ['id' => $oid, 'nom' => $o['nom'], 'imatge' => $o['imatge'], 'borrar' => false];
+    }
+    $vistaNuevos = array_fill(0, OUTFITS_NUEVOS_POR_FORM, ['nom' => '']);
+
+    $resultado = ['errores' => [], 'datos' => $datos, 'editando' => $editando,
+                  'outfits' => $vistaOutfits, 'nuevos' => $vistaNuevos];
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         return $resultado;
@@ -136,19 +185,69 @@ function procesarFormularioPersonaje(int $id): array
     $titol = trim($_POST['titol'] ?? '');
     $cos   = trim($_POST['cos'] ?? '');
     $va    = trim($_POST['va'] ?? '');
+    $extra = [
+        'frase'       => textoPost($_POST['frase'] ?? ''),
+        'anniversary' => textoPost($_POST['anniversary'] ?? ''),
+        'height'      => textoPost($_POST['height'] ?? ''),
+        'weight'      => textoPost($_POST['weight'] ?? ''),
+    ];
 
-    // Mantenemos lo escrito por el usuario si hay errores (y la imagen actual)
-    $resultado['datos'] = array_merge($datos, ['titol' => $titol, 'cos' => $cos, 'va' => $va]);
+    $nomsOutfit    = is_array($_POST['outfit_nom'] ?? null) ? $_POST['outfit_nom'] : [];
+    $borrarOutfits = is_array($_POST['outfit_del'] ?? null) ? $_POST['outfit_del'] : [];
+    $nomsNuevos    = is_array($_POST['new_nom'] ?? null) ? $_POST['new_nom'] : [];
+    $archivosOutfit = archivosPorClave('outfit_img');
+    $archivosNuevos = archivosPorClave('new_img');
+
+    // Mantenemos lo escrito por el usuario si hay errores (las imágenes elegidas no se pueden conservar)
+    $resultado['datos'] = array_merge($datos, ['titol' => $titol, 'cos' => $cos, 'va' => $va], $extra);
+    foreach ($outfitsActuales as $oid => $o) {
+        $resultado['outfits'][$oid]['nom']    = array_key_exists($oid, $nomsOutfit) ? textoPost($nomsOutfit[$oid]) : $o['nom'];
+        $resultado['outfits'][$oid]['borrar'] = isset($borrarOutfits[$oid]);
+    }
+    for ($i = 0; $i < OUTFITS_NUEVOS_POR_FORM; $i++) {
+        $resultado['nuevos'][$i]['nom'] = textoPost($nomsNuevos[$i] ?? '');
+    }
 
     if (!csrfValido()) {
         $resultado['errores']['general'] = 'Form expired (or file too large). Please try again.';
         return $resultado;
     }
 
-    $errores = validarPersonaje($titol, $cos, $va);
+    // ---- Validación ----
+    $errores  = validarPersonaje($titol, $cos, $va) + validarDatosExtra($extra);
     $errorImg = validarImagenSubida($_FILES['imatge'] ?? []);
     if ($errorImg) {
         $errores['imatge'] = $errorImg;
+    }
+
+    $totalOutfits = 0;
+    foreach ($resultado['outfits'] as $oid => $o) {
+        if ($o['borrar']) {
+            continue;
+        }
+        $totalOutfits++;
+        $e = validarOutfit($o['nom'], $archivosOutfit[$oid] ?? [], false);
+        foreach ($e as $campo => $mensaje) {
+            $errores['outfit_' . ($campo === 'nom' ? 'nom' : 'img') . '_' . $oid] = $mensaje;
+        }
+    }
+    $nuevosUsados = [];   // huecos nuevos en los que el usuario ha escrito un nombre o elegido una imagen
+    for ($i = 0; $i < OUTFITS_NUEVOS_POR_FORM; $i++) {
+        $archivo = $archivosNuevos[$i] ?? [];
+        $nom     = $resultado['nuevos'][$i]['nom'];
+        $usado   = $nom !== '' || ($archivo['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE;
+        if (!$usado) {
+            continue;
+        }
+        $nuevosUsados[] = $i;
+        $totalOutfits++;
+        $e = validarOutfit($nom, $archivo, true);
+        foreach ($e as $campo => $mensaje) {
+            $errores['new_' . ($campo === 'nom' ? 'nom' : 'img') . '_' . $i] = $mensaje;
+        }
+    }
+    if ($totalOutfits > OUTFITS_MAX) {
+        $errores['outfits'] = 'A character can have at most ' . OUTFITS_MAX . ' outfits.';
     }
 
     if ($errores) {
@@ -156,28 +255,73 @@ function procesarFormularioPersonaje(int $id): array
         return $resultado;
     }
 
+    // ---- Guardado: todo en una transacción; las imágenes nuevas se limpian si algo falla ----
+    $pdo        = getConexion();
+    $escritas   = [];   // imágenes nuevas ya copiadas al disco (se borran si hay que deshacer)
+    $obsoletas  = [];   // imágenes antiguas que se borran del disco cuando todo ha ido bien
+
     try {
-        // Solo se guarda la imagen en disco cuando todo lo demás es válido
         $rutaNueva = guardarImagenSubida($_FILES['imatge'] ?? []);
+        if ($rutaNueva !== null) {
+            $escritas[] = $rutaNueva;
+        }
+
+        $pdo->beginTransaction();
 
         if ($editando) {
-            modificarPersonaje($id, usuarioId(), $titol, $cos, $va, $rutaNueva);
-            // Si se ha reemplazado la imagen, borramos la anterior (solo si es una subida nuestra)
+            modificarPersonaje($id, usuarioId(), $titol, $cos, $va, $rutaNueva, $extra);
+            $articleId = $id;
             if ($rutaNueva !== null) {
-                borrarImagenSubida($datos['imatge']);
+                $obsoletas[] = $datos['imatge'];
             }
-            flash('ok', 'Character updated.');
         } else {
-            crearPersonaje(usuarioId(), $titol, $cos, $va, $rutaNueva);
-            flash('ok', 'Character created.');
+            $articleId = crearPersonaje(usuarioId(), $titol, $cos, $va, $rutaNueva, $extra);
         }
-        redirigir('index.php');
-    } catch (PDOException $e) {
+
+        // Outfits que ya existían: borrar o renombrar / cambiar imagen
+        foreach ($outfitsActuales as $oid => $o) {
+            if ($resultado['outfits'][$oid]['borrar']) {
+                borrarOutfit($oid, $articleId);
+                $obsoletas[] = $o['imatge'];
+                continue;
+            }
+            $imgOutfit = guardarImagenSubida($archivosOutfit[$oid] ?? []);
+            if ($imgOutfit !== null) {
+                $escritas[]  = $imgOutfit;
+                $obsoletas[] = $o['imatge'];
+            }
+            modificarOutfit($oid, $articleId, $resultado['outfits'][$oid]['nom'], $imgOutfit);
+        }
+
+        // Outfits nuevos: van al final del carrusel
+        if ($nuevosUsados) {
+            $ordre = siguienteOrdreOutfit($articleId);
+            foreach ($nuevosUsados as $i) {
+                $imgOutfit  = guardarImagenSubida($archivosNuevos[$i]);
+                $escritas[] = $imgOutfit;
+                crearOutfit($articleId, $resultado['nuevos'][$i]['nom'], $imgOutfit, $ordre++);
+            }
+        }
+
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        foreach ($escritas as $ruta) {
+            borrarImagenSubida($ruta);
+        }
         error_log($e->getMessage());
         $resultado['errores']['general'] = 'The character could not be saved. Please try again later.';
+        return $resultado;
     }
 
-    return $resultado;
+    // Todo guardado: ahora sí se borran del disco las imágenes que ya no se usan (solo las de uploads/)
+    foreach ($obsoletas as $ruta) {
+        borrarImagenSubida($ruta);
+    }
+    flash('ok', $editando ? 'Character updated.' : 'Character created.');
+    redirigir('index.php');
 }
 
 /** Procesa el borrado (solo POST + CSRF + autor). Siempre redirige. */
@@ -198,11 +342,17 @@ function procesarBorradoPersonaje(): void
             flash('error', 'The character does not exist.');
         } elseif (!esAutor($personaje)) {
             flash('error', 'You can only delete your own characters.');
-        } elseif (borrarPersonaje($id, usuarioId())) {
-            borrarImagenSubida($personaje['imatge']);
-            flash('ok', 'Character deleted.');
         } else {
-            flash('error', 'Could not delete.');
+            $outfits = obtenerOutfits($id);   // se leen antes de borrar, para poder limpiar sus imágenes
+            if (borrarPersonaje($id, usuarioId())) {
+                borrarImagenSubida($personaje['imatge']);
+                foreach ($outfits as $o) {
+                    borrarImagenSubida($o['imatge']);
+                }
+                flash('ok', 'Character deleted.');
+            } else {
+                flash('error', 'Could not delete.');
+            }
         }
     } catch (PDOException $e) {
         error_log($e->getMessage());
