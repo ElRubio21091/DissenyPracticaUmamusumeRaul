@@ -14,7 +14,7 @@
         </div>
 
         <nav aria-label="Main navigation" class="flex flex-wrap items-center justify-center gap-3 text-sm font-bold text-white">
-            <a href="#" class="rounded-full border border-black bg-brand-pink px-6 py-2 hover:brightness-110">Fan letters</a>
+            <a href="fan_letters.php" class="rounded-full border border-black bg-brand-pink px-6 py-2 hover:brightness-110">Fan letters</a>
             <a href="index.php"<?= basename($_SERVER['SCRIPT_NAME']) === 'index.php' ? ' aria-current="page"' : '' ?> class="rounded-full border border-black bg-brand-pink px-8 py-2 hover:brightness-110">Home</a>
 
             <?php if (estaLogueado()): ?>
