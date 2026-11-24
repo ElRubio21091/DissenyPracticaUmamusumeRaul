@@ -34,7 +34,7 @@ include __DIR__ . '/includes/head.php';
 include __DIR__ . '/includes/header.php';
 ?>
 
-<main class="mx-auto w-full max-w-7xl flex-1 px-4 pb-8 pt-10 xl:max-w-none xl:px-[8.8vw] xl:pt-[4.75vw]">
+<main id="main" tabindex="-1" class="mx-auto w-full max-w-7xl flex-1 px-4 pb-8 pt-10 xl:max-w-none xl:px-[8.8vw] xl:pt-[4.75vw]">
     <div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
         <span class="hidden w-56 sm:block"></span>
         <h1 class="text-[length:clamp(26px,1.878vw,48px)] font-bold leading-none">CHARACTERS</h1>

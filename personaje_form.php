@@ -28,7 +28,7 @@ $fieldsetClass = 'rounded-3xl border border-black px-5 pb-5 pt-2';
 $legendClass   = 'px-2 text-sm font-bold text-brand-pink';
 ?>
 
-<main class="mx-auto w-full max-w-xl flex-1 px-4 pb-10 pt-10 sm:pt-16">
+<main id="main" tabindex="-1" class="mx-auto w-full max-w-xl flex-1 px-4 pb-10 pt-10 sm:pt-16">
     <h1 class="text-center text-2xl font-bold"><?= $editando ? 'EDIT CHARACTER' : 'NEW CHARACTER' ?></h1>
 
     <form action="personaje_form.php" method="post" enctype="multipart/form-data" class="mt-8 space-y-4" novalidate>

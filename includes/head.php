@@ -24,4 +24,7 @@
     </script>
 </head>
 <body class="min-h-screen flex flex-col bg-brand-paper font-sans text-black">
+<a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:font-bold">
+    Skip to main content
+</a>
 <?php include __DIR__ . '/flash.php'; ?>

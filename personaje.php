@@ -29,7 +29,7 @@ include __DIR__ . '/includes/head.php';
 include __DIR__ . '/includes/header.php';
 ?>
 
-<main class="grid w-full flex-1 md:grid-cols-[minmax(18rem,35%)_1fr]">
+<main id="main" tabindex="-1" class="grid w-full flex-1 md:grid-cols-[minmax(18rem,35%)_1fr]">
 
     <!-- Columna izquierda: carrusel de outfits -->
     <section id="outfits" aria-roledescription="carousel" aria-label="Outfits of <?= e($p['titol']) ?>"
