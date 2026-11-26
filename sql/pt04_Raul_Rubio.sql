@@ -16,11 +16,14 @@ CREATE TABLE `usuaris` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(30) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,          -- resultado de password_hash(), nunca la contraseña en claro
+  `password_hash` varchar(255) DEFAULT NULL,      -- resultado de password_hash(), nunca la contraseña en claro.
+                                                  -- NULL si la cuenta se creó con Google (no tiene contraseña local)
+  `google_id` varchar(255) DEFAULT NULL,          -- identificador "sub" de Google (login OAuth), NULL si nunca ha entrado con Google
   `data_registre` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_username` (`username`),
-  UNIQUE KEY `uq_email` (`email`)
+  UNIQUE KEY `uq_email` (`email`),
+  UNIQUE KEY `uq_google_id` (`google_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------

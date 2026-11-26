@@ -103,8 +103,10 @@ function procesarLogin(): array
     if (!$errores) {
         try {
             $usuario = buscarUsuarioPorIdentificador($identificador);
-            // Mismo mensaje si falla el usuario o la contraseña: no revelamos cuál de los dos es
-            if (!$usuario || !password_verify($password, $usuario['password_hash'])) {
+            // Mismo mensaje si falla el usuario o la contraseña: no revelamos cuál de los dos es.
+            // Las cuentas creadas con Google no tienen contraseña (NULL): solo pueden entrar con Google.
+            if (!$usuario || $usuario['password_hash'] === null
+                || !password_verify($password, $usuario['password_hash'])) {
                 $errores['general'] = 'Incorrect username or password.';
             } else {
                 loguearUsuario($usuario);

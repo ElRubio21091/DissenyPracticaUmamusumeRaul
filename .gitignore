@@ -15,6 +15,7 @@ vendor/
 # Configuracion y secretos
 .env
 .env.*
+!.env.example
 
 # Logs y temporales
 *.log
